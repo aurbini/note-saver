@@ -61,8 +61,8 @@ app.delete("/api/notes/:id", function(req, res) {
   let dbJSON = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'))
   //console.log(dbJSON); 
   const filteredArr = dbJSON.filter(note =>note.id !== idToDelete)
-  JSON.stringify(filteredArr);
-  fs.writeFile('./db/db.json', filteredArr, 'utf-8', err => {
+  const stringDB = JSON.stringify(filteredArr);
+  fs.writeFile('./db/db.json', stringDB, 'utf-8', err => {
     if (err) throw err; 
 
   });
