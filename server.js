@@ -31,11 +31,22 @@ app.post("/api/notes", function(req, res) {
 
     const parsedArray = JSON.parse(data); 
     parsedArray.push(newNote);
+   // console.log('Before ID ARRAy ' + parsedArray); 
+    idArray = parsedArray.map((note, index) => {
+      note.id = index; 
+    })
+   // console.log('id array is ' + idArray); 
+    //console.log('after ID array ' + parsedArray); 
+
     const stringArray = JSON.stringify(parsedArray);
+
+    //console.log(stringArray); 
+    
     fs.writeFile('./db/db.json', stringArray,'utf-8', (err) => {
       if(err) throw err
       console.log('writing')
     })
+
 
     res.json(parsedArray);
   })
@@ -46,23 +57,17 @@ app.post("/api/notes", function(req, res) {
 app.delete("/api/notes/:id", function(req, res) {
   //GET AN ID FROM THE NOTE IN THE DB
   //IF ID MATCHES DELETE
-  const query = req.params
-  fs.readFile('./db/db.json', 'utf-8',(err,data)=>{
-    const parsedArray = JSON.parse(data);
-    const idArray = parsedArray.map((note,index) => {
-      note['id'] = index
-      return note;
-    })
+  const idToDelete = parseInt(req.params.id);
+  let dbJSON = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'))
+  //console.log(dbJSON); 
+  const filteredArr = dbJSON.filter(note =>note.id !== idToDelete)
+  JSON.stringify(filteredArr);
+  fs.writeFile('./db/db.json', filteredArr, 'utf-8', err => {
+    if (err) throw err; 
 
-    const filteredArr = idArray.filter(note =>note.id !== parseInt(query.id)) 
-
-    fs.writeFile('./db/db.json', filteredArr, 'utf-8', err => {
-      if (err) throw err; 
-
-    });
-    res.json(filteredArr)
-  })
-});
+  });
+  res.json(filteredArr)
+})
   
 
 //HTML ROUTES
@@ -80,3 +85,10 @@ app.get("*", function(req, res) {
 app.listen(PORT, function() {
   console.log("App listening on PORT " + PORT);
 });
+
+
+
+//idArray = parsedArray.map((note,index) => {
+  //   note['id'] = index
+  //   return note;
+  // })
