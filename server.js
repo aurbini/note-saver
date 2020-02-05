@@ -1,4 +1,5 @@
 //Dependencies
+//===============================================
 const express = require("express");
 const path = require('path'); 
 const fs = require('fs');
@@ -7,7 +8,7 @@ const app = express();
 const PORT = 7000 ; 
 
 // Sets up the Express app to handle data parsing
-//MiddleWare
+//MiddleWare=======================================
 app.use(express.static('public'));
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -23,6 +24,7 @@ app.get("/api/notes", function(req, res) {
 });
 
 //POST NOTES
+//==============================================
 app.post("/api/notes", function(req, res) {
   const newNote = req.body; 
   fs.readFile('./db/db.json', 'utf-8', (err, data) => {
@@ -34,23 +36,25 @@ app.post("/api/notes", function(req, res) {
       if(err) throw err
       console.log('writing')
     })
- //=================================================
 
     res.json(parsedArray);
   })
 });
 
 //DELETE A NOTE
+ //=================================================
 app.delete("/api/notes/:id", function(req, res) {
   //GET AN ID FROM THE NOTE IN THE DB
   //IF ID MATCHES DELETE
   const query = req.params
   fs.readFile('./db/db.json', 'utf-8',(err,data)=>{
     const parsedArray = JSON.parse(data);
-    idArray = parsedArray.map((note,index) => {
-      note[index] = index
+    const idArray = parsedArray.map((note,index) => {
+      note['id'] = index
+      return note;
     })
-    const filteredArr = parsedArray.filter(note =>note.id !== parseInt(query.id)) 
+
+    const filteredArr = idArray.filter(note =>note.id !== parseInt(query.id)) 
 
     fs.writeFile('./db/db.json', filteredArr, 'utf-8', err => {
       if (err) throw err; 
@@ -60,11 +64,6 @@ app.delete("/api/notes/:id", function(req, res) {
   })
 });
   
-
-
-
-
-
 
 //HTML ROUTES
 //===================================================
@@ -77,6 +76,7 @@ app.get("*", function(req, res) {
 });
 
 //Listener
+//=============================================
 app.listen(PORT, function() {
   console.log("App listening on PORT " + PORT);
 });
