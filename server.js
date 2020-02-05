@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 //Port and Server
 const app = express();
-const PORT = 7000 ; 
+const PORT = process.env.PORT || 7000; 
 
 // Sets up the Express app to handle data parsing
 //MiddleWare=======================================
