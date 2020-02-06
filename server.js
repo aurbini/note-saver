@@ -28,43 +28,38 @@ app.get("/api/notes", function(req, res) {
 app.post("/api/notes", function(req, res) {
   const newNote = req.body; 
   fs.readFile('./db/db.json', 'utf-8', (err, data) => {
-
+    //ADDING ID TO EVERY NOTE
     const parsedArray = JSON.parse(data); 
     parsedArray.push(newNote);
-   // console.log('Before ID ARRAy ' + parsedArray); 
-    idArray = parsedArray.map((note, index) => {
-      note.id = index; 
-    })
-   // console.log('id array is ' + idArray); 
-    //console.log('after ID array ' + parsedArray); 
-
-    const stringArray = JSON.stringify(parsedArray);
-
-    //console.log(stringArray); 
-    
+    let idArray = []; 
+    for(var i = 0; i < parsedArray.length; i++){
+      let note = parsedArray[i];
+      note.id = i; 
+      idArray.push(note); 
+    }
+    //console.log(idArray);
+    const stringArray = JSON.stringify(idArray);
+    //WRITING THE UPDATED NOTE TO DATABASE 
     fs.writeFile('./db/db.json', stringArray,'utf-8', (err) => {
       if(err) throw err
-      console.log('writing')
+      //console.log('writing')
     })
-
-
-    res.json(parsedArray);
+    //SENDING RESPONSE
+    res.json(idArray);
   })
 });
 
 //DELETE A NOTE
  //=================================================
 app.delete("/api/notes/:id", function(req, res) {
-  //GET AN ID FROM THE NOTE IN THE DB
-  //IF ID MATCHES DELETE
+  //GET AN ID FROM THE NOTE TO BE DELETED
+  //IF ID MATCHES NOTE IN DATABASE DELETE THE NOTE
   const idToDelete = parseInt(req.params.id);
   let dbJSON = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'))
-  //console.log(dbJSON); 
   const filteredArr = dbJSON.filter(note =>note.id !== idToDelete)
   const stringDB = JSON.stringify(filteredArr);
   fs.writeFile('./db/db.json', stringDB, 'utf-8', err => {
     if (err) throw err; 
-
   });
   res.json(filteredArr)
 })
@@ -87,8 +82,3 @@ app.listen(PORT, function() {
 });
 
 
-
-//idArray = parsedArray.map((note,index) => {
-  //   note['id'] = index
-  //   return note;
-  // })
